@@ -1,0 +1,11 @@
+{
+  "imports": {
+    "xstate": "npm:xstate"
+  },
+  "exclude": [
+    "**/node_modules/*",
+    "**/.vscode/*",
+    "**/.github/*",
+    "**/dist/*"
+  ]
+}
