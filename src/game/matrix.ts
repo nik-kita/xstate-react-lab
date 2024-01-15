@@ -12,9 +12,46 @@ export class Matrix {
     for (let i = 0; i < rows * cols; ++i) {
       this._cells.push({ free: true });
       if (i >= rows * cols - cols) {
-        this._bottom.push(i);
+        this._bottom.push(i + this._cols_rows.cols);
       }
     }
+  }
+
+  rm_full_lines() {
+    const res = {
+      ok: false,
+    };
+    const bottom = this._bottom.sort();
+    for (
+      let i = 0, len = this._cols_rows.rows * this._cols_rows.cols;
+      i < len;
+      i += this._cols_rows.rows
+    ) {
+      const start_line = bottom.findIndex((position) => position === i);
+
+      if (start_line === -1) {
+        continue;
+      }
+
+      let is_full = true;
+
+      for (let j = 0; j < this._cols_rows.cols; ++j) {
+        if (bottom[start_line + j] !== i + j) {
+          is_full = false;
+          break;
+        }
+      }
+
+      if (is_full) {
+        bottom.splice(start_line, this._cols_rows.cols);
+        for (let j = 0; j < start_line; ++j) {
+          bottom[j] += this._cols_rows.rows * 2;
+        }
+        res.ok = true;
+      }
+    }
+
+    return res;
   }
 
   tetromino_to_bottom(tetromino_id: string) {
@@ -26,7 +63,11 @@ export class Matrix {
       };
     }
     const { seq } = target;
-    if (seq.some((position) => this._bottom.includes(position))) {
+    if (
+      seq.some((position) =>
+        this._bottom.includes(position + this._cols_rows.cols)
+      )
+    ) {
       seq.forEach((position) => {
         const cell = this._cells[position] as Cell<unknown>;
         if (cell.position === undefined) {
@@ -53,7 +94,11 @@ export class Matrix {
   detect_bottom() {
     const on_bottom = [] as string[];
     this._tetrominos.forEach(({ seq, tetromino }) => {
-      if (seq.some((position) => this._bottom.includes(position))) {
+      if (
+        seq.some((position) =>
+          this._bottom.includes(position + this._cols_rows.rows)
+        )
+      ) {
         on_bottom.push(tetromino._id);
       }
     });
