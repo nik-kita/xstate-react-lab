@@ -10,7 +10,15 @@ Deno.test("Matrix.tetromino_to_bottom one", () => {
       [true, true, true],
     ],
   });
-  const res = m.place_tetromino(t);
+  const res_place = m.calculate_place_for_tetromino(t);
+  if (!res_place.ok) {
+    assertEquals("not to be", "here");
+    return;
+  }
+  const res = m.place_tetromino(t, {
+    seq: res_place.seq,
+    start_position: res_place.start_position,
+  });
   if (!res.ok) {
     assertEquals("not to be", "here", res.toString());
     return;

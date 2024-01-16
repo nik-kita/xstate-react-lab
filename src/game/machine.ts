@@ -1,6 +1,7 @@
 import { createMachine, raise, setup } from "xstate";
 import { Matrix } from "./matrix";
 import { Tetromino } from "./tetromino";
+import { Move } from "./engine/types";
 
 export const machine = setup({
   actions: {
@@ -24,33 +25,53 @@ export const machine = setup({
         res = params.matrix.rm_full_lines();
       }
     },
-    place_tetromino: (_, params: { matrix: Matrix; tetromino: Tetromino }) => {
-      params.matrix.place_tetromino(params.tetromino);
+    place_tetromino: (
+      { context },
+      params: {
+        matrix: Matrix;
+        tetromino: Tetromino;
+        seq: number[];
+        start_position: number;
+      },
+    ) => {
+      const { tetromino, ...rest } = params;
+      const res = params.matrix.place_tetromino(tetromino, rest);
+
+      if (res.ok) {
+        context.current_tetromino = params.tetromino;
+      } else {
+        context.current_tetromino = undefined;
+        raise({ type: "GAME_OVER" });
+      }
     },
   },
-  actors: {},
   guards: {
-    is_available_space_for_tetromino: ({ context, event }, params: unknown) => {
+    is_available_space_for_tetromino: ({ context }, params: {
+      tetromino: Tetromino;
+      start_position: number;
+    }) => {
+      const { tetromino, start_position } = params;
+      const res = context.matrix.calculate_place_for_tetromino(tetromino, {
+        start_position,
+      });
+
+      if (res.ok) {
+        context.current_seq = res.seq;
+        return true;
+      }
+
       return false;
-    },
-    is_tetromino_placed: (
-      _,
-      params: { matrix: Matrix; tetromino: Tetromino | null },
-    ) => {
-      return !!params.tetromino &&
-        params.matrix._tetrominos.has(params.tetromino._id);
     },
   },
   delays: {},
   types: {
-    context: {} as Context,
+    context: {} as GameMachineContext,
   },
 }).createMachine(
   {
     id: "game",
     context: {
       matrix: new Matrix({ cols: 10, rows: 20 }),
-      current_tetromino: null,
     },
     initial: "Tetromino_creation",
     states: {
@@ -58,27 +79,29 @@ export const machine = setup({
         on: {
           ADD_TO_MATRIX: [
             {
+              guard: {
+                type: "is_available_space_for_tetromino",
+                params({ context, event }) {
+                  return {
+                    start_position: event.start_position,
+                    tetromino: event.tetromino,
+                  };
+                },
+              },
               actions: [
                 {
                   type: "place_tetromino",
-                  params: ({ context, event }) => {
+                  params: ({ context }) => {
                     return {
                       matrix: context.matrix,
-                      tetromino: event.tetromino,
+                      tetromino: context.current_tetromino!,
+                      start_position: context.current_start_position!,
+                      seq: context.current_seq!,
                     };
                   },
                 },
               ],
               target: "Fly",
-              guard: {
-                type: "is_tetromino_placed",
-                params: ({ context }) => {
-                  return {
-                    matrix: context.matrix,
-                    tetromino: context.current_tetromino,
-                  };
-                },
-              },
             },
             {
               target: "Game_over",
@@ -118,15 +141,19 @@ export const machine = setup({
       },
     },
     types: {
-      events: {} as
-        | { type: "MOVE" }
-        | { type: "MEET_BOTTOM" }
-        | { type: "ADD_TO_MATRIX"; tetromino: Tetromino },
+      events: {} as GameMachineEvent,
     },
   },
 );
 
-type Context = {
+export type GameMachineEvent =
+  | { type: "MOVE"; direction: Move }
+  | { type: "MEET_BOTTOM" }
+  | { type: "ADD_TO_MATRIX"; tetromino: Tetromino; start_position: number };
+
+export type GameMachineContext = {
   matrix: Matrix;
-  current_tetromino: Tetromino | null;
+  current_tetromino?: Tetromino;
+  current_seq?: number[];
+  current_start_position?: number;
 };

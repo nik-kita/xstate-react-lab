@@ -10,15 +10,39 @@ Deno.test("Matrix.rm_full_line()", () => {
       [true],
     ],
   });
-  m.place_tetromino(t, { start_position: 0 });
+  const place = m.calculate_place_for_tetromino(t, { start_position: 0 });
+  if (!place.ok) {
+    assertEquals("not to", "be here");
+    return;
+  }
+  m.place_tetromino(t, {
+    start_position: place.start_position,
+    seq: place.seq,
+  });
   const rm1 = m.rm_full_lines();
   assertEquals(rm1.ok, false);
   const t2 = t.clone();
-  m.place_tetromino(t2, { start_position: 4 });
+  const place2 = m.calculate_place_for_tetromino(t2, { start_position: 4 });
+  if (!place2.ok) {
+    assertEquals("not to", "be here");
+    return;
+  }
+  m.place_tetromino(t2, {
+    start_position: place2.start_position,
+    seq: place2.seq,
+  });
   const bottom = m.detect_bottom();
   assertEquals(bottom.length, 1);
   const t3 = t.clone();
-  m.place_tetromino(t3, { start_position: 5 });
+  const place3 = m.calculate_place_for_tetromino(t3, { start_position: 5 });
+  if (!place3.ok) {
+    assertEquals("not to", "be here");
+    return;
+  }
+  m.place_tetromino(t3, {
+    start_position: place3.start_position,
+    seq: place3.seq,
+  });
   const to_bottom_res2 = m.tetromino_to_bottom(t2._id);
   assertEquals(to_bottom_res2.ok, true);
   const to_bottom_res = m.tetromino_to_bottom(t._id);
