@@ -1,7 +1,7 @@
 import { createMachine, raise, setup } from "xstate";
-import { Matrix } from "./matrix";
-import { Tetromino } from "./tetromino";
-import { Move } from "./engine/types";
+import { Matrix } from "./matrix.ts";
+import { Tetromino } from "./tetromino.ts";
+import { Move } from "./engine/types.ts";
 
 export const machine = setup({
   actions: {
