@@ -7,8 +7,12 @@ export const machine = setup({
   actions: {
     detect_bottom: (_, params: {
       matrix: Matrix;
-      tetromino: Tetromino;
+      tetromino?: Tetromino;
     }) => {
+      if (!params.tetromino) {
+        console.warn("detect bottom was called unnecessary");
+        return;
+      }
       if (params.matrix.detect_bottom().includes(params.tetromino._id)) {
         params.matrix.tetromino_to_bottom(params.tetromino._id);
         raise({ type: "MEET_BOTTOM" });
@@ -29,13 +33,20 @@ export const machine = setup({
       { context },
       params: {
         matrix: Matrix;
-        tetromino: Tetromino;
-        seq: number[];
-        start_position: number;
+        tetromino?: Tetromino;
+        seq?: number[];
+        start_position?: number;
       },
     ) => {
-      const { tetromino, ...rest } = params;
-      const res = params.matrix.place_tetromino(tetromino, rest);
+      const { tetromino, seq, start_position } = params;
+      if (!tetromino || !seq || !start_position) {
+        console.warn("place tetromino was called unnecessary");
+        return;
+      }
+      const res = params.matrix.place_tetromino(tetromino, {
+        seq,
+        start_position,
+      });
 
       if (res.ok) {
         context.current_tetromino = params.tetromino;
@@ -95,9 +106,9 @@ export const machine = setup({
                   params: ({ context }) => {
                     return {
                       matrix: context.matrix,
-                      tetromino: context.current_tetromino!,
-                      start_position: context.current_start_position!,
-                      seq: context.current_seq!,
+                      tetromino: context.current_tetromino,
+                      start_position: context.current_start_position,
+                      seq: context.current_seq,
                     };
                   },
                 },
@@ -114,7 +125,7 @@ export const machine = setup({
         entry: {
           type: "detect_bottom",
           params: ({ context }) => {
-            console.log('detect bottom');
+            console.log("detect bottom");
             return {
               matrix: context.matrix,
               tetromino: context.current_tetromino!,
