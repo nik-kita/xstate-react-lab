@@ -22,7 +22,9 @@ Deno.test("Matrix.tetromino_to_bottom one", () => {
   m.move_tetromino(res.tetromino_id, { type: "down" });
   m.move_tetromino(res.tetromino_id, { type: "down" });
   assertEquals(
-    m._tetrominos.get(res.tetromino_id)!.seq.some((s) => m._bottom.includes(s)),
+    m._tetrominos.get(res.tetromino_id)!.seq.some((s) =>
+      m._bottom.includes(s + 4)
+    ),
     true,
   );
   m.tetromino_to_bottom(res.tetromino_id);

@@ -1,13 +1,13 @@
 import { assertEquals } from "https://deno.land/std@0.211.0/assert/assert_equals.ts";
-import { Matrix } from '../src/game/matrix.ts'
-import { Tetromino } from '../src/game/tetromino.ts';
+import { Matrix } from "../src/game/matrix.ts";
+import { Tetromino } from "../src/game/tetromino.ts";
 
 Deno.test("new Matrix one", () => {
   const m = new Matrix({ cols: 2, rows: 3 });
   assertEquals(m._bottom.length, 2);
   assertEquals(m._bottom.includes(0), false);
   assertEquals(m._bottom.includes(3), false);
-  assertEquals(m._bottom.includes(4), true);
+  assertEquals(m._bottom.includes(6), true);
 });
 
 Deno.test("Matrix.detect_bottom one", () => {
@@ -18,14 +18,14 @@ Deno.test("Matrix.detect_bottom one", () => {
       [true, true],
     ],
   });
-  const bottom_res = m.place_tetromino(t.clone(), { start_position: 4 });
+  const tb = t.clone();
+  const bottom_res = m.place_tetromino(tb, { start_position: 4 });
   const upper_res = m.place_tetromino(t, { start_position: 0 });
   if (!upper_res.ok || !bottom_res.ok) {
     assertEquals("not to be", "here");
     return;
   }
-
-  assertEquals(m.detect_bottom()[0], bottom_res.tetromino_id);
+  assertEquals(m.detect_bottom().at(-1), bottom_res.tetromino_id);
   assertEquals(m.detect_bottom().length, 1);
 });
 
