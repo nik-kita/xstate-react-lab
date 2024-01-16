@@ -5,6 +5,9 @@ import { Move } from "./engine/types.ts";
 
 export const machine = setup({
   actions: {
+    generate_matrix: ({ context }, { x, y }: { x: number; y: number }) => {
+      context.matrix = new Matrix({ cols: x, rows: y });
+    },
     detect_bottom: (_, params: {
       matrix: Matrix;
       tetromino?: Tetromino;
@@ -81,12 +84,28 @@ export const machine = setup({
   },
 }).createMachine(
   {
-    id: "game",
+    id: "game 2",
     context: {
       matrix: new Matrix({ cols: 10, rows: 20 }),
     },
-    initial: "Tetromino_creation",
+    initial: "Idle",
     states: {
+      Idle: {
+        on: {
+          GENERATE_MATRIX: {
+            target: "Tetromino_creation",
+            actions: [{
+              type: "generate_matrix",
+              params({ context, event }) {
+                return {
+                  x: event.x,
+                  y: event.y,
+                };
+              },
+            }],
+          },
+        },
+      },
       Tetromino_creation: {
         on: {
           ADD_TO_MATRIX: [
@@ -150,7 +169,11 @@ export const machine = setup({
         },
       },
       Game_over: {
-        type: "final",
+        on: {
+          REPEAT_GAME: {
+            target: "Idle",
+          },
+        },
       },
     },
     types: {
@@ -162,7 +185,9 @@ export const machine = setup({
 export type GameMachineEvent =
   | { type: "MOVE"; direction: Move }
   | { type: "MEET_BOTTOM" }
-  | { type: "ADD_TO_MATRIX"; tetromino: Tetromino; start_position: number };
+  | { type: "GENERATE_MATRIX"; x: number; y: number }
+  | { type: "ADD_TO_MATRIX"; tetromino: Tetromino; start_position: number }
+  | { type: "REPEAT_GAME" };
 
 export type GameMachineContext = {
   matrix: Matrix;
