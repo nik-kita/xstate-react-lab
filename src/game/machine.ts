@@ -57,6 +57,7 @@ export const machine = setup({
 
       if (res.ok) {
         context.current_seq = res.seq;
+        context.current_start_position = res.start_position;
         return true;
       }
 
@@ -113,6 +114,7 @@ export const machine = setup({
         entry: {
           type: "detect_bottom",
           params: ({ context }) => {
+            console.log('detect bottom');
             return {
               matrix: context.matrix,
               tetromino: context.current_tetromino!,
