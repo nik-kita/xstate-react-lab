@@ -1,13 +1,13 @@
-import { raise, setup } from "xstate";
+import { setup } from "xstate";
 import { Matrix } from "../engine/matrix.ts";
-import { Tetromino } from "../engine/tetromino.ts";
 import { GameMachineContext } from "./context.ts";
-import { GameEvent } from "./events.ts";
-import { move_tetromino } from "./move_tetromino.action.ts";
-import { generate_matrix } from "./generate_matrix.action.ts";
 import { detect_bottom } from "./detect_bottom.action.ts";
-import { rm_full_lines } from "./rm_full_lines.action.ts";
+import { GameEvent } from "./events.ts";
+import { generate_matrix } from "./generate_matrix.action.ts";
+import { is_available_space_for_tetromino } from "./is_available_space_for_tetromino.guard.ts";
+import { move_tetromino } from "./move_tetromino.action.ts";
 import { place_tetromino } from "./place_tetromino.action.ts";
+import { rm_full_lines } from "./rm_full_lines.action.ts";
 
 export const machine = setup({
   actions: {
@@ -18,31 +18,8 @@ export const machine = setup({
     place_tetromino,
   },
   guards: {
-    is_available_space_for_tetromino: ({ context }, params: {
-      tetromino: Tetromino;
-      start_position: number;
-    }) => {
-      if (!context.matrix) {
-        console.warn(
-          "<is_available> space for tetromino was called unnecessary",
-        );
-        return false;
-      }
-      const { tetromino, start_position } = params;
-      const res = context.matrix.calculate_place_for_tetromino(tetromino, {
-        start_position,
-      });
-      if (res.ok) {
-        context.current_seq = res.seq;
-        context.current_start_position = res.start_position;
-        context.current_tetromino = tetromino;
-        return true;
-      }
-
-      return false;
-    },
+    is_available_space_for_tetromino,
   },
-  delays: {},
   types: {
     context: {} as GameMachineContext,
   },
