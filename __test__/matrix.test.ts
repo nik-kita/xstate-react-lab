@@ -19,8 +19,28 @@ Deno.test("Matrix.detect_bottom one", () => {
     ],
   });
   const tb = t.clone();
-  const bottom_res = m.place_tetromino(tb, { start_position: 4 });
-  const upper_res = m.place_tetromino(t, { start_position: 0 });
+  const bottom_place = m.calculate_place_for_tetromino(tb, {
+    start_position: 4,
+  });
+
+  if (!bottom_place.ok) {
+    assertEquals("not", "to be here");
+    return;
+  }
+
+  const bottom_res = m.place_tetromino(tb, {
+    start_position: bottom_place.start_position,
+    seq: bottom_place.seq,
+  });
+  const upper_place = m.calculate_place_for_tetromino(t, { start_position: 0 });
+  if (!upper_place.ok) {
+    assertEquals("not", "to be here");
+    return;
+  }
+  const upper_res = m.place_tetromino(t, {
+    seq: upper_place.seq,
+    start_position: upper_place.start_position,
+  });
   if (!upper_res.ok || !bottom_res.ok) {
     assertEquals("not to be", "here");
     return;
@@ -37,15 +57,23 @@ Deno.test("Matrix.place_tetromino one", () => {
       [false, true],
     ],
   });
-  const happy = m.place_tetromino(t);
+  const happy_place = m.calculate_place_for_tetromino(t);
+  if (!happy_place.ok) {
+    assertEquals("not", "to be here");
+    return;
+  }
+  const happy = m.place_tetromino(t, {
+    start_position: happy_place.start_position,
+    seq: happy_place.seq,
+  });
   assertEquals(happy.ok, true);
-  assertEquals(m.place_tetromino(t).ok, false);
+  assertEquals(m.calculate_place_for_tetromino(t).ok, false);
   if (happy.ok) {
     assertEquals(m.rm_tetromino(happy.tetromino_id).ok, true);
   } else {
     assertEquals("not to be", "here");
   }
-  assertEquals(m.place_tetromino(t).ok, true);
+  assertEquals(m.calculate_place_for_tetromino(t).ok, true);
 });
 
 Deno.test("Matrix.place_tetromino two", () => {
@@ -56,9 +84,32 @@ Deno.test("Matrix.place_tetromino two", () => {
       [false, true],
     ],
   });
-  assertEquals(m.place_tetromino(t).ok, true);
-  assertEquals(m.place_tetromino(t, { start_position: 2 }).ok, false);
-  assertEquals(m.place_tetromino(t.clone(), { start_position: 2 }).ok, true);
+  const t_place = m.calculate_place_for_tetromino(t);
+  if (!t_place.ok) {
+    assertEquals("not", "to be here");
+    return;
+  }
+  assertEquals(
+    m.place_tetromino(t, {
+      seq: t_place.seq,
+      start_position: t_place.start_position,
+    }).ok,
+    true,
+  );
+  assertEquals(
+    m.calculate_place_for_tetromino(t, { start_position: 2 }).ok,
+    false,
+  );
+  const t2 = t.clone();
+  const t2_place = m.calculate_place_for_tetromino(t2, { start_position: 2 });
+  if (!t2_place.ok) {
+    assertEquals("not", "to be here");
+    return;
+  }
+  assertEquals(
+    m.calculate_place_for_tetromino(t2, { start_position: 2 }).ok,
+    true,
+  );
 });
 
 Deno.test("Matrix.move_tetromino one", () => {
@@ -69,9 +120,19 @@ Deno.test("Matrix.move_tetromino one", () => {
       [false, true],
     ],
   });
-  const res = m.place_tetromino(t);
-  const res2 = m.place_tetromino(t.clone(), { start_position: 4 });
-  assertEquals(res2.ok, false);
+  const res_place = m.calculate_place_for_tetromino(t);
+  if (!res_place.ok) {
+    assertEquals("not", "to be here");
+    return;
+  }
+  const res = m.place_tetromino(t, {
+    seq: res_place.seq,
+    start_position: res_place.start_position,
+  });
+  const t2 = t.clone();
+  const res2_place = m.calculate_place_for_tetromino(t2, { start_position: 4 });
+
+  assertEquals(res2_place.ok, false);
   if (res.ok) {
     m.move_tetromino(res.tetromino_id, { type: "right" });
     const move_res = m.move_tetromino(res.tetromino_id, { type: "right" });
@@ -79,6 +140,7 @@ Deno.test("Matrix.move_tetromino one", () => {
   } else {
     assertEquals("not to be", "here");
   }
-  const res3 = m.place_tetromino(t.clone(), { start_position: 4 });
+  const t3 = t.clone();
+  const res3 = m.calculate_place_for_tetromino(t3, { start_position: 4 });
   assertEquals(res3.ok, true);
 });

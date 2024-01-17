@@ -7,5 +7,10 @@
     "**/.vscode/*",
     "**/.github/*",
     "**/dist/*"
-  ]
+  ],
+  "lint": {
+    "rules": {
+      "exclude": ["no-unused-vars"]
+    }
+  }
 }

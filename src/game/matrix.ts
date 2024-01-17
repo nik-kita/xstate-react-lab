@@ -154,27 +154,31 @@ export class Matrix {
       start_position,
       this._cols_rows.rows,
     );
-    const res = matrix_imposition({
-      parent: this._cols_rows,
-      child: tetromino.cols_rows,
-    }, {
+    const res = this.calculate_place_for_tetromino(tetromino, {
       start_position: next_position,
     });
     if (!res.ok) {
-      this.place_tetromino(tetromino, { start_position });
+      this.place_tetromino(tetromino, { seq: target.seq, start_position });
       return res;
     }
 
-    this.place_tetromino(tetromino, { start_position: next_position });
+    this.place_tetromino(tetromino, {
+      seq: res.seq,
+      start_position: next_position,
+    });
     return {
       ok: true,
       tetromino_id,
     };
   }
 
-  place_tetromino(tetromino: Tetromino, options: {
+  calculate_place_for_tetromino(tetromino: Tetromino, options: {
     start_position?: number;
-  } = {}): { ok: false; reason: string } | { ok: true; tetromino_id: string } {
+  } = {}): { ok: false; reason: string } | {
+    ok: true;
+    seq: number[];
+    start_position: number;
+  } {
     if (this._tetrominos.has(tetromino._id)) {
       return {
         ok: false,
@@ -194,25 +198,35 @@ export class Matrix {
     });
 
     if (res.ok) {
-      this._tetrominos.set(tetromino._id, {
-        seq: res.seq,
-        tetromino,
-        start_position,
-      });
-      res.seq.forEach((position, i) => {
-        const cell = this._cells[position] as Cell<false>;
-        cell.free = false;
-        cell.tetromino_id = tetromino._id;
-        cell.position = i;
-        this._occupied.add(position);
-      });
-
       return {
-        ok: true,
-        tetromino_id: tetromino._id,
+        ...res,
+        start_position,
       };
-    } else {
-      return res;
     }
+
+    return res;
+  }
+
+  place_tetromino(
+    tetromino: Tetromino,
+    { seq, start_position }: { seq: number[]; start_position: number },
+  ): { ok: false; reason: string } | { ok: true; tetromino_id: string } {
+    this._tetrominos.set(tetromino._id, {
+      seq,
+      tetromino,
+      start_position,
+    });
+    seq.forEach((position, i) => {
+      const cell = this._cells[position] as Cell<false>;
+      cell.free = false;
+      cell.tetromino_id = tetromino._id;
+      cell.position = i;
+      this._occupied.add(position);
+    });
+
+    return {
+      ok: true,
+      tetromino_id: tetromino._id,
+    };
   }
 }
