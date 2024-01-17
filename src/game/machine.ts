@@ -112,7 +112,7 @@ export const machine = setup({
   },
 }).createMachine(
   {
-    id: "game 2",
+    id: "game 3",
     context: {
       matrix: new Matrix({ cols: 10, rows: 20 }),
     },

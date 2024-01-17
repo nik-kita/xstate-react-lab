@@ -1,10 +1,14 @@
 import "./App.css";
+import Game from "./Game";
+import { GameContext } from "./GameContext";
 
 function App() {
   return (
-    <div>
-      hello world
-    </div>
+    <GameContext.Provider>
+      <div>
+        <Game />
+      </div>
+    </GameContext.Provider>
   );
 }
 
