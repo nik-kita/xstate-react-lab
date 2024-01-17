@@ -40,4 +40,21 @@ Deno.test("GameMachine one", () => {
     } satisfies GameMachineEvent,
   );
   assertEquals(game.getSnapshot().value, "Game_over");
+  game.send({ type: "REPEAT_GAME" } satisfies GameMachineEvent);
+  assertEquals(game.getSnapshot().value, "Idle");
+  game.send(
+    { type: "GENERATE_MATRIX", x: 10, y: 10 } satisfies GameMachineEvent,
+  );
+  assertEquals(game.getSnapshot().value, "Tetromino_creation");
+  game.send(
+    {
+      type: "ADD_TO_MATRIX",
+      start_position: 0,
+      tetromino: t,
+    } satisfies GameMachineEvent,
+  );
+  assertEquals(game.getSnapshot().value, "Fly");
+  game.send({ type: "MOVE", direction: "down" } satisfies GameMachineEvent);
+  assertEquals(game.getSnapshot().value, "Fly");
+  assertEquals(game.getSnapshot().context.current_start_position, 10);
 });
