@@ -1,4 +1,38 @@
 export class Tetromino {
+  static _cube = new Tetromino({
+    shape: [
+      [true, true],
+      [true, true],
+    ],
+  });
+
+  static get cube() {
+    return this._cube.clone();
+  }
+
+  static _line_h = new Tetromino({
+    shape: [
+      [true, true, true, true],
+    ],
+  });
+
+  static get line_h() {
+    return this._line_h.clone();
+  }
+
+  static _line_v = new Tetromino({
+    shape: [
+      [true],
+      [true],
+      [true],
+      [true],
+    ],
+  });
+
+  static get line_v() {
+    return this._line_v.clone();
+  }
+
   constructor({ shape }: {
     shape: [boolean[], ...boolean[][]];
   }) {

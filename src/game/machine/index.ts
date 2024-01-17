@@ -1,86 +1,21 @@
 import { raise, setup } from "xstate";
-import { Move } from "./engine/types.ts";
-import { Matrix } from "./engine/matrix.ts";
-import { Tetromino } from "./engine/tetromino.ts";
+import { Matrix } from "../engine/matrix.ts";
+import { Tetromino } from "../engine/tetromino.ts";
+import { GameMachineContext } from "./context.ts";
 import { GameEvent } from "./events.ts";
+import { move_tetromino } from "./move_tetromino.action.ts";
+import { generate_matrix } from "./generate_matrix.action.ts";
+import { detect_bottom } from "./detect_bottom.action.ts";
+import { rm_full_lines } from "./rm_full_lines.action.ts";
+import { place_tetromino } from "./place_tetromino.action.ts";
 
 export const machine = setup({
   actions: {
-    move_tetromino: ({ context }, { direction }: { direction: Move }) => {
-      const { matrix, current_tetromino, current_start_position } = context;
-      if (
-        !matrix || !current_tetromino || current_start_position === undefined
-      ) {
-        console.warn("<move_tetromino> was called unnecessary");
-        return;
-      }
-      const res = matrix.move_tetromino(current_tetromino._id, {
-        type: direction,
-      });
-      if (res.ok) {
-        const t = context.matrix!._tetrominos.get(current_tetromino._id)!;
-        context.current_start_position = t.start_position;
-      }
-    },
-    generate_matrix: ({ context }, { x, y }: { x: number; y: number }) => {
-      context.matrix = new Matrix({ cols: x, rows: y });
-    },
-    detect_bottom: (_, params: {
-      matrix?: Matrix;
-      tetromino?: Tetromino;
-    }) => {
-      if (!params.tetromino || !params.matrix) {
-        console.warn("<detect_bottom> was called unnecessary");
-        return;
-      }
-      if (params.matrix.detect_bottom().includes(params.tetromino._id)) {
-        params.matrix.tetromino_to_bottom(params.tetromino._id);
-        raise({ type: "MEET_BOTTOM" });
-      }
-    },
-    rm_full_lines: (_, params: { matrix?: Matrix }) => {
-      if (!params.matrix) {
-        console.warn("<rm_full_lines> was called unnecessary");
-        return;
-      }
-
-      let infinite_guard = 0;
-      let res = params.matrix.rm_full_lines();
-      while (res.ok) {
-        if (infinite_guard > 600) {
-          throw new Error("infinite loop during full lines removing");
-        }
-        ++infinite_guard;
-        res = params.matrix.rm_full_lines();
-      }
-    },
-    place_tetromino: (
-      { context },
-      params: {
-        tetromino?: Tetromino;
-        seq?: number[];
-        start_position?: number;
-      },
-    ) => {
-      const { tetromino, seq, start_position } = params;
-      if (
-        !tetromino || !seq || start_position === undefined || !context.matrix
-      ) {
-        console.warn("<place_tetromino> was called unnecessary");
-        return;
-      }
-      const res = context.matrix.place_tetromino(tetromino, {
-        seq,
-        start_position,
-      });
-
-      if (res.ok) {
-        context.current_tetromino = params.tetromino;
-      } else {
-        context.current_tetromino = undefined;
-        raise({ type: "GAME_OVER" });
-      }
-    },
+    move_tetromino,
+    generate_matrix,
+    detect_bottom,
+    rm_full_lines,
+    place_tetromino,
   },
   guards: {
     is_available_space_for_tetromino: ({ context }, params: {
@@ -223,10 +158,3 @@ export const machine = setup({
     },
   },
 );
-
-export type GameMachineContext = {
-  matrix?: Matrix;
-  current_tetromino?: Tetromino;
-  current_seq?: number[];
-  current_start_position?: number;
-};

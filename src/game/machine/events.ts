@@ -1,5 +1,5 @@
-import { Tetromino } from "./engine/tetromino";
-import { Move } from "./engine/types";
+import { Tetromino } from "../engine/tetromino.ts";
+import { Move } from "../engine/types.ts";
 
 export type GameEvent =
   | { type: "MOVE"; direction: Move }
