@@ -2,6 +2,7 @@ import { raise, setup } from "xstate";
 import { Move } from "./engine/types.ts";
 import { Matrix } from "./engine/matrix.ts";
 import { Tetromino } from "./engine/tetromino.ts";
+import { GameEvent } from "./events.ts";
 
 export const machine = setup({
   actions: {
@@ -218,17 +219,10 @@ export const machine = setup({
       },
     },
     types: {
-      events: {} as GameMachineEvent,
+      events: {} as GameEvent,
     },
   },
 );
-
-export type GameMachineEvent =
-  | { type: "MOVE"; direction: Move }
-  | { type: "MEET_BOTTOM" }
-  | { type: "GENERATE_MATRIX"; x: number; y: number }
-  | { type: "ADD_TO_MATRIX"; tetromino: Tetromino; start_position: number }
-  | { type: "REPEAT_GAME" };
 
 export type GameMachineContext = {
   matrix?: Matrix;
