@@ -1,6 +1,6 @@
-import { MOVE_CALCULATOR } from "./engine/const.ts";
-import { matrix_imposition } from "./engine/matrix_imposition.ts";
-import { Cell, Move } from "./engine/types.ts";
+import { MOVE_CALCULATOR } from "./const.ts";
+import { matrix_imposition } from "./matrix_imposition.ts";
+import { Cell, Move } from "./types.ts";
 import { Tetromino } from "./tetromino.ts";
 
 export class Matrix {

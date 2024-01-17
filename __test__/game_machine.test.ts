@@ -1,7 +1,7 @@
 import { createActor } from "xstate";
 import { GameMachineEvent, machine } from "../src/game/machine.ts";
 import { assertEquals } from "https://deno.land/std@0.211.0/assert/assert_equals.ts";
-import { Tetromino } from "../src/game/tetromino.ts";
+import { Tetromino } from "../src/game/engine/tetromino.ts";
 
 Deno.test("GameMachine one", () => {
   const game = createActor(machine);

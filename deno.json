@@ -1,6 +1,7 @@
 {
   "imports": {
-    "xstate": "npm:xstate"
+    "xstate": "npm:xstate",
+    "vite": "npm:vite"
   },
   "exclude": [
     "**/node_modules/*",

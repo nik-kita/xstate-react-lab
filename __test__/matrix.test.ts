@@ -1,6 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.211.0/assert/assert_equals.ts";
-import { Matrix } from "../src/game/matrix.ts";
-import { Tetromino } from "../src/game/tetromino.ts";
+import { Matrix } from "../src/game/engine/matrix.ts";
+import { Tetromino } from "../src/game/engine/tetromino.ts";
 
 Deno.test("new Matrix one", () => {
   const m = new Matrix({ cols: 2, rows: 3 });
