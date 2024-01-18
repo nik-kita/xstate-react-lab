@@ -1,5 +1,5 @@
 import { createActor } from "xstate";
-import { machine } from "../src/game/machine/index.ts";
+import { machine } from "../src/game/machine/game.machine.ts";
 import { assertEquals } from "https://deno.land/std@0.211.0/assert/assert_equals.ts";
 import { Tetromino } from "../src/game/engine/tetromino.ts";
 import { GameEvent } from "../src/game/machine/events.ts";

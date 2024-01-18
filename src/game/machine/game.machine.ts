@@ -1,5 +1,4 @@
 import { setup } from "xstate";
-import { Matrix } from "../engine/matrix.ts";
 import { GameMachineContext } from "./context.ts";
 import { detect_bottom } from "./detect_bottom.action.ts";
 import { GameEvent } from "./events.ts";
@@ -28,9 +27,7 @@ export const machine = setup({
 }).createMachine(
   {
     id: "game 4",
-    context: {
-      matrix: new Matrix({ cols: 10, rows: 20 }),
-    },
+    context: {},
     initial: "Idle",
     states: {
       Idle: {
@@ -87,6 +84,7 @@ export const machine = setup({
         entry: {
           type: "detect_bottom",
           params: ({ context }) => {
+            console.log("detecting bottom on enter");
             return {
               matrix: context.matrix,
               tetromino: context.current_tetromino!,
@@ -99,6 +97,7 @@ export const machine = setup({
             actions: {
               type: "rm_full_lines",
               params: ({ context }) => {
+                console.log("meet bottom");
                 return {
                   matrix: context.matrix,
                 };
@@ -106,14 +105,26 @@ export const machine = setup({
             },
           },
           MOVE: {
-            actions: [{
-              type: "move_tetromino",
-              params: ({ event }) => {
-                return {
-                  direction: event.direction,
-                };
+            actions: [
+              {
+                type: "move_tetromino",
+                params: ({ event }) => {
+                  return {
+                    direction: event.direction,
+                  };
+                },
               },
-            }],
+              {
+                type: "detect_bottom",
+                params: ({ context }) => {
+                  console.log("detecting bottom on move");
+                  return {
+                    matrix: context.matrix,
+                    tetromino: context.current_tetromino!,
+                  };
+                },
+              },
+            ],
             target: "Fly",
           },
         },
