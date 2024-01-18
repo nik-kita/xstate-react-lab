@@ -7,6 +7,7 @@ import { generate_matrix } from "./generate_matrix.action.ts";
 import { is_available_space_for_tetromino } from "./is_available_space_for_tetromino.guard.ts";
 import { move_tetromino } from "./move_tetromino.action.ts";
 import { place_tetromino } from "./place_tetromino.action.ts";
+import { reset_context } from "./reset_context.action.ts";
 import { rm_full_lines } from "./rm_full_lines.action.ts";
 
 export const machine = setup({
@@ -16,6 +17,7 @@ export const machine = setup({
     detect_bottom,
     rm_full_lines,
     place_tetromino,
+    reset_context,
   },
   guards: {
     is_available_space_for_tetromino,
@@ -25,7 +27,7 @@ export const machine = setup({
   },
 }).createMachine(
   {
-    id: "game 3",
+    id: "game 4",
     context: {
       matrix: new Matrix({ cols: 10, rows: 20 }),
     },
@@ -117,12 +119,9 @@ export const machine = setup({
         },
       },
       Game_over: {
-        entry: [({ context }) => {
-          context.matrix = undefined;
-          context.current_tetromino = undefined;
-          context.current_seq = undefined;
-          context.current_start_position = undefined;
-        }],
+        entry: [
+          "reset_context",
+        ],
         on: {
           REPEAT_GAME: {
             target: "Idle",
