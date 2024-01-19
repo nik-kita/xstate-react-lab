@@ -12,7 +12,6 @@ export const is_bottom = (_: { context: GameMachineContext }, params: {
   }
   if (params.matrix.detect_bottom().includes(params.tetromino._id)) {
     params.matrix.tetromino_to_bottom(params.tetromino._id);
-    console.log("bottom!");
 
     return true;
   }

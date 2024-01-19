@@ -8,7 +8,7 @@ Deno.test("GameMachine two", () => {
   const actor = createActor(machine);
 
   const subscription = actor.subscribe((state) => {
-    console.log(state.value);
+    // console.debug(state.value);
   });
 
   actor.start();
@@ -19,5 +19,18 @@ Deno.test("GameMachine two", () => {
   actor.send(GameEventGenerator.MOVE_DOWN());
   assertEquals(actor.getSnapshot().context.matrix?._tetrominos.size, 0);
   assertEquals(actor.getSnapshot().value, "Tetromino_creation");
+  const occupied_count = actor.getSnapshot().context.matrix?._occupied.size ??
+    0;
+  actor.send(GameEventGenerator.ADD_TO_MATRIX(Tetromino.cube, 0));
+  assertEquals(
+    actor.getSnapshot().context.matrix?._occupied.size,
+    occupied_count * 2,
+  );
+  actor.send(GameEventGenerator.MOVE_DOWN()); // should be ignored
+  actor.send(GameEventGenerator.MOVE_DOWN()); // should be ignored
+  actor.send(GameEventGenerator.MOVE_DOWN()); // should be ignored
+  assertEquals(actor.getSnapshot().value, "Tetromino_creation");
+  actor.send(GameEventGenerator.ADD_TO_MATRIX(Tetromino.cube, 0));
+  assertEquals(actor.getSnapshot().value, "Game_over");
   subscription.unsubscribe();
 });

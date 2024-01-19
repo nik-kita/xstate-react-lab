@@ -9,7 +9,6 @@ export const rm_full_lines = (
     console.warn("<rm_full_lines> was called unnecessary");
     return;
   }
-  console.log("rm_full_lines");
   let infinite_guard = 0;
   let res = params.matrix.rm_full_lines();
   while (res.ok) {

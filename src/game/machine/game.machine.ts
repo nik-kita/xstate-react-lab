@@ -96,7 +96,6 @@ export const machine = setup({
           actions: {
             type: "rm_full_lines",
             params: ({ context }) => {
-              console.log("meet bottom");
               return {
                 matrix: context.matrix,
               };
