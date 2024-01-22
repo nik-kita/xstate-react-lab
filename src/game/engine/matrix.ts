@@ -4,10 +4,7 @@ import { Cell, Move } from "./types.ts";
 import { Tetromino } from "./tetromino.ts";
 
 export class Matrix {
-  constructor({ rows, cols }: {
-    rows: number;
-    cols: number;
-  }) {
+  constructor({ rows, cols }: { rows: number; cols: number }) {
     this._cols_rows = { rows, cols };
     for (let i = 0; i < rows * cols; ++i) {
       this._cells.push({ free: true });
@@ -25,7 +22,7 @@ export class Matrix {
     for (
       let i = 0, len = this._cols_rows.rows * this._cols_rows.cols;
       i < len;
-      i += this._cols_rows.rows
+      i += this._cols_rows.cols
     ) {
       const start_line = bottom.findIndex((position) => position === i);
 
@@ -45,7 +42,12 @@ export class Matrix {
       if (is_full) {
         bottom.splice(start_line, this._cols_rows.cols);
         for (let j = 0; j < start_line; ++j) {
-          bottom[j] += this._cols_rows.rows * 2;
+          bottom[j] += this._cols_rows.cols;
+        }
+        for (let j = 0; j < bottom.length; ++j) {
+          this._cells[bottom[j] - this._cols_rows.cols].free = true;
+          this._occupied.delete(bottom[j] - this._cols_rows.cols);
+          this._occupied.delete(bottom[j]);
         }
         res.ok = true;
       }
@@ -96,7 +98,7 @@ export class Matrix {
     this._tetrominos.forEach(({ seq, tetromino }) => {
       if (
         seq.some((position) =>
-          this._bottom.includes(position + this._cols_rows.rows)
+          this._bottom.includes(position + this._cols_rows.cols)
         )
       ) {
         on_bottom.push(tetromino._id);
@@ -138,9 +140,14 @@ export class Matrix {
     };
   }
 
-  move_tetromino(tetromino_id: string, { type }: {
-    type: Move;
-  }) {
+  move_tetromino(
+    tetromino_id: string,
+    {
+      type,
+    }: {
+      type: Move;
+    },
+  ) {
     const target = this._tetrominos.get(tetromino_id);
     if (!target) {
       return {
@@ -152,7 +159,7 @@ export class Matrix {
     this.rm_tetromino(tetromino_id);
     const next_position = MOVE_CALCULATOR[type](
       start_position,
-      this._cols_rows.rows,
+      this._cols_rows.cols,
     );
     const res = this.calculate_place_for_tetromino(tetromino, {
       start_position: next_position,
@@ -172,30 +179,36 @@ export class Matrix {
     };
   }
 
-  calculate_place_for_tetromino(tetromino: Tetromino, options: {
-    start_position?: number;
-  } = {}): { ok: false; reason: string } | {
-    ok: true;
-    seq: number[];
-    start_position: number;
-  } {
+  calculate_place_for_tetromino(
+    tetromino: Tetromino,
+    options: {
+      start_position?: number;
+    } = {},
+  ):
+    | { ok: false; reason: string }
+    | {
+      ok: true;
+      seq: number[];
+      start_position: number;
+    } {
     if (this._tetrominos.has(tetromino._id)) {
       return {
         ok: false,
         reason: "this tetromino is already placed",
       };
     }
-    const {
-      start_position = 0,
-    } = options;
-    const res = matrix_imposition({
-      parent: this._cols_rows,
-      child: tetromino.cols_rows,
-    }, {
-      start_position,
-      occupied: this._occupied,
-      shape: tetromino.shape,
-    });
+    const { start_position = 0 } = options;
+    const res = matrix_imposition(
+      {
+        parent: this._cols_rows,
+        child: tetromino.cols_rows,
+      },
+      {
+        start_position,
+        occupied: this._occupied,
+        shape: tetromino.shape,
+      },
+    );
 
     if (res.ok) {
       return {

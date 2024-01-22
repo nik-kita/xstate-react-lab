@@ -6,9 +6,7 @@ export const move_tetromino = (
   { direction }: { direction: Move },
 ) => {
   const { matrix, current_tetromino, current_start_position } = context;
-  if (
-    !matrix || !current_tetromino || current_start_position === undefined
-  ) {
+  if (!matrix || !current_tetromino || current_start_position === undefined) {
     console.warn("<move_tetromino> was called unnecessary");
     return;
   }
