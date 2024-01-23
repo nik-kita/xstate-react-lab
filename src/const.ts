@@ -1,4 +1,4 @@
 export const MATRIX = {
-  x: 12,
+  x: 8,
   y: 20,
 };

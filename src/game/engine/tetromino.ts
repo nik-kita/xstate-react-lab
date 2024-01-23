@@ -8,10 +8,28 @@ export class Tetromino {
 
   static get random() {
     const now = Date.now();
-    if (Date.now() % 3) {
+    if (Date.now() % 4 === 0) {
       return this.cube;
-    } else if (Date.now() % 2) {
+    } else if (Date.now() % 3 === 0) {
       return this.line_h;
+    } else if (Date.now() % 2 === 0) {
+      return Math.random() > Math.random()
+        ? new Tetromino({
+          shape: [
+            [true, false],
+            [true, false],
+            [true, false],
+            [true, true],
+          ],
+        })
+        : new Tetromino({
+          shape: [
+            [false, true],
+            [false, true],
+            [false, true],
+            [true, true],
+          ],
+        });
     }
 
     return this.line_v;

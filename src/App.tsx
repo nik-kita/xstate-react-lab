@@ -7,6 +7,7 @@ function App() {
     <GameContext.Provider>
       <div
         style={{
+          backgroundColor: "lightgreen",
           height: "100vh",
           width: "100vw",
         }}

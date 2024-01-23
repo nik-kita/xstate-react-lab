@@ -1,13 +1,12 @@
 .cell {
+  
   display: inline-block;
-  min-height: 4px;
-  min-width: 4px;
-  margin-bottom: 1px;
-  margin-left: 1px;
+  min-height: 1px;
+  min-width: 1px;
   background-color: lightgreen;
 }
 
 .cell-active {
   background-color: green;
-  outline: 1px solid ghostwhite;
+  outline: 1px inset grey;
 }

@@ -1,4 +1,3 @@
-import css from "./Buttons.module.css";
 import { GameContext } from "./GameContext";
 import { MATRIX } from "./const";
 import { GameEventGenerator } from "./game/machine/events";
@@ -9,6 +8,11 @@ export default function Buttons() {
   if (actor_ref.getSnapshot().value === "Game_over") {
     return (
       <button
+        style={{
+          position: "absolute",
+          width: "100vw",
+          height: "100vh",
+        }}
         onClick={() => {
           actor_ref.send(GameEventGenerator.REPEAT_GAME());
           actor_ref.send(
@@ -20,37 +24,4 @@ export default function Buttons() {
       </button>
     );
   }
-
-  return (
-    <div className={css["hjkl"]}>
-      <button
-        onClick={() => {
-          actor_ref.send(GameEventGenerator.MOVE_LEFT());
-        }}
-      >
-        H
-      </button>
-      <button
-        onClick={() => {
-          actor_ref.send(GameEventGenerator.MOVE_DOWN());
-        }}
-      >
-        J
-      </button>
-      <button
-        onClick={() => {
-          actor_ref.send(GameEventGenerator.MOVE_UP());
-        }}
-      >
-        K
-      </button>
-      <button
-        onClick={() => {
-          actor_ref.send(GameEventGenerator.MOVE_RIGHT());
-        }}
-      >
-        L
-      </button>
-    </div>
-  );
 }

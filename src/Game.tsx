@@ -29,6 +29,7 @@ export default function Game() {
       }
     });
 
+    const press_type = "keydown" as const;
     const hjkl = (ev: KeyboardEvent) => {
       if (ev.key === "h" || ev.key === "ArrowLeft") {
         actor_ref.send(GameEventGenerator.MOVE_LEFT());
@@ -43,14 +44,14 @@ export default function Game() {
         actor_ref.send(GameEventGenerator.GENERATE_MATRIX(MATRIX.x, MATRIX.y));
       }
     };
-    window.addEventListener("keyup", hjkl);
+    window.addEventListener(press_type, hjkl);
 
     const auto = setInterval(() => {
       actor_ref.send(GameEventGenerator.MOVE_DOWN());
-    }, 150);
+    }, 500);
 
     return () => {
-      window.removeEventListener("keyup", hjkl);
+      window.removeEventListener(press_type, hjkl);
       clearInterval(auto);
       subscription.unsubscribe();
     };
@@ -58,9 +59,12 @@ export default function Game() {
 
   return (
     <>
+      <Buttons />
       <div
         style={{
-          height: "90vh",
+          marginBottom: "1rem",
+          height: "92vh",
+          width: "100vw",
           display: "grid",
           gridTemplateColumns: `repeat(${MATRIX.x}, 1fr)`,
           gridTemplateRows: `repeat(${MATRIX.y}, 1fr)`,
@@ -78,7 +82,36 @@ export default function Game() {
           );
         })}
       </div>
-      <Buttons />
+      <div className="hjkl">
+        <button
+          onClick={() => {
+            actor_ref.send(GameEventGenerator.MOVE_LEFT());
+          }}
+        >
+          H=left
+        </button>
+        <button
+          onClick={() => {
+            actor_ref.send(GameEventGenerator.MOVE_DOWN());
+          }}
+        >
+          J=down
+        </button>
+        <button
+          onClick={() => {
+            actor_ref.send(GameEventGenerator.MOVE_UP());
+          }}
+        >
+          K=up
+        </button>
+        <button
+          onClick={() => {
+            actor_ref.send(GameEventGenerator.MOVE_RIGHT());
+          }}
+        >
+          L=right
+        </button>
+      </div>
     </>
   );
 }
