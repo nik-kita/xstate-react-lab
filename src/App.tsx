@@ -5,7 +5,12 @@ import { GameContext } from "./GameContext";
 function App() {
   return (
     <GameContext.Provider>
-      <div>
+      <div
+        style={{
+          height: "100vh",
+          width: "100vw",
+        }}
+      >
         <Game />
       </div>
     </GameContext.Provider>

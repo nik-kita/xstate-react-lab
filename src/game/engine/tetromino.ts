@@ -6,14 +6,23 @@ export class Tetromino {
     ],
   });
 
+  static get random() {
+    const now = Date.now();
+    if (Date.now() % 3) {
+      return this.cube;
+    } else if (Date.now() % 2) {
+      return this.line_h;
+    }
+
+    return this.line_v;
+  }
+
   static get cube() {
     return this._cube.clone();
   }
 
   static _line_h = new Tetromino({
-    shape: [
-      [true, true, true, true],
-    ],
+    shape: [[true, true, true, true]],
   });
 
   static get line_h() {
@@ -21,26 +30,21 @@ export class Tetromino {
   }
 
   static _line_v = new Tetromino({
-    shape: [
-      [true],
-      [true],
-      [true],
-      [true],
-    ],
+    shape: [[true], [true], [true], [true]],
   });
 
   static get line_v() {
     return this._line_v.clone();
   }
 
-  constructor({ shape }: {
-    shape: [boolean[], ...boolean[][]];
-  }) {
+  constructor({ shape }: { shape: [boolean[], ...boolean[][]] }) {
     this._shape = shape;
     this._rows = shape.length;
     this._cols = shape[0].length;
     this._id = `tetromino${Date.now()}${
-      Math.random().toString().substring(2, 4)
+      Math.random()
+        .toString()
+        .substring(2, 4)
     }`;
   }
   _id: string;

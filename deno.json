@@ -10,6 +10,7 @@
     "**/dist/*"
   ],
   "lint": {
+    "exclude": ["src"],
     "rules": {
       "exclude": ["no-unused-vars"]
     }
